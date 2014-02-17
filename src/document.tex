@@ -69,11 +69,6 @@
 % If IEEEtran.cls has not been installed into the LaTeX system files,
 % manually specify the path to it like:
 % \documentclass[conference]{../sty/IEEEtran}
-
-
-
-
-
 % Some very useful LaTeX packages include:
 % (uncomment the ones you want to load)
 
@@ -95,11 +90,6 @@
 % \ifCLASSINFOpdf conditional that works the same way.
 % When switching from latex to pdflatex and vice-versa, the compiler may
 % have to be run twice to clear warning/error messages.
-
-
-
-
-
 
 % *** CITATION PACKAGES ***
 %
@@ -139,7 +129,7 @@
   % driver is specified.
   \usepackage[dvips]{graphicx}
   % declare the path(s) where your graphic files are
-  % \graphicspath{{../eps/}}
+  \graphicspath{{../fig/}}
   % and their extensions so you won't have to specify these with
   % every instance of \includegraphics
   % \DeclareGraphicsExtensions{.eps}
@@ -543,6 +533,15 @@ gesture immediately at the start of the ``nucleus'' phase and to discrete flow
 gesture at the end of the ``nucleus'' phase.
 
 \section{Related Work}
+\subsection{Hand Pose Recognition}
+\cite{freeman95} uses histogram of local orientations, a precursor of HOGs for
+hand pose recognition.
+
+\subsection{Recognition Gestures with Distinct Paths}
+The gesture production process has a direct analogy to the
+speech production process \cite{Kettebekov01}, and as a result many previous
+work have used HMM for gesture recognition with distinct paths
+\cite{Starner95, sharma00}.
 
 \section{Implications for Gesture Recognition Technology}
 
@@ -558,16 +557,53 @@ the hand joint position reported from the SDK to find the initial rough estimati
 bounding box of the hand in the depth frame. Then we use skin detection to
 filter out non-skin pixels in the bounding box after aligning the RGB and the
 depth frames, and refine the bounding box using 4 interactions of CAMSHIFT
-\cite{bradski98}. We normalize the bounding box to a $64\times 64$ px depth
+\cite{bradski98}. We normalize the bounding box to a $32\times 32$ px depth
 mapped image. Histogram of oriented gradients (HOGs) \cite{dalal05} is computed from
 the normalized hand image (cell size = 4, number of orientation bins = 9). We
 only use one fold of normalization to speed up processing and since the depth
-data is not affected significantly by lighting conditions. The HOG feature has
-been used as a hand pose descriptor in previous works \cite{song12} where they
-are often used as the input to a classifier such as Support Vector Machine
+data is not affected significantly by lighting conditions. This gives us a
+HOG feature of length 441 ($(32/4 - 1)\times (32/4 - 1)\times 9$). The HOG
+feature has been used as a hand pose descriptor in previous works \cite{song12} where they are often used as the input to a classifier such as Support Vector Machine
 (SVM). Here, after applying principal component analysis (PCA) to reduce the
 dimensionality from 441 to 14, we use it directly as part of the input feature
 vector to the hidden Markov model (HMM) based recognition framework.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig/system_overview.ps}
+\caption{Simulation Results}
+\label{fig_sim}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig/hand_tracking.ps}
+\caption{Hand tracking and hand pose feature extraction.}
+\label{fig_sim}
+\end{figure}
+
+The feature vector $\underline{x}_t$ at frame $t$ to the recognition
+module is then a concatenation of motion features and encoded HOG features. The
+motion features include relative position of the hand to the shoulder joint,
+velocity and and acceleration, all in 3D world coordinate. The feature vector is
+computed for each input frame streamed from the sensor to form a sequence of
+feature vectors.
+
+\section{Real-Time Continuous Gesture Recognition}
+The temporal model of gestures can be represented by a stochastic state machine.
+Each gesture phase can again be represented by a stochastic state machine with
+each state generates an observation (i.e. the feature vector). This process
+can be viewed as a hierarchical hidden Markov model. If we assume that the
+states in the sub-HMMs are not shared, we can collapse the hierarchical HMM
+into a one-level HMM. 
+
+pre-stroke to post-stroke
+If we have ground truth label, we can train the three phases separately
+embeded training or 
+
+Incorporate hand pose gesture 
+
+\subsection{Online Inference}
 
 \section{Experimental Evaluation}
 compare depth, color images
@@ -588,15 +624,6 @@ compare PCA
 % option should be used if it is desired that the figures are to be
 % displayed while in draft mode.
 %
-%\begin{figure}[!t]
-%\centering
-%\includegraphics[width=2.5in]{myfigure}
-% where an .eps filename suffix will be assumed under latex, 
-% and a .pdf suffix will be assumed for pdflatex; or what has been declared
-% via \DeclareGraphicsExtensions.
-%\caption{Simulation Results}
-%\label{fig_sim}
-%\end{figure}
 
 % Note that IEEE typically puts floats only at the top, even when this
 % results in a large percentage of a column being occupied by floats.

@@ -350,25 +350,23 @@ Email: davis@csail.mit.edu}
 
 \begin{abstract}
 %\boldmath
-We design our real-time continuous gesture recognition system based on previous
-user studies on natural interaction, and thus are able to address problems that
-are neglected before: how to combine gestures that are characterized by
-their dynamic paths and gestures that are characterized by their hand poses in
-one system; how and when the system should respond to gestures with different
-\textit{flows}. Our probabilistic based recognition framework unifies the
-recognition of the two \textit{forms} of gestures. Using information from the
-hidden states in the hidden Markov model, we can identify different
+Our real-time continuous gesture recognition system addresses problems that
+have previously been neglected, including handling both gestures that are
+characterized by their dynamic paths and gestures characterized by their hand
+poses; and determining how and when the system should respond to gestures. Our probabilistic recognition framework based on hidden
+Markov models (HMMs) unifies the recognition of the two forms of gestures.
+Using information from the
+hidden states in the HMM, we can identify different
 gesture phases: the pre-stroke, the nucleus and the post-stroke
 phases.
-This allows the system to respond appropriately according to gestures that
-require discrete or continuous responses.
-We also collected a new gesture data set that
-contains the two \textit{forms} of gestures, and propose a new performance
-metric that is relevant for evaluating gesture recognition methods for real-time
+This allows the system to respond appropriately to both gestures that
+require a discrete response and those needing a continuous response.
+Our system is extensible: in only a few minutes, users can define their own
+gestures by giving a few examples rather than writing code.
+We also collected a new gesture dataset that
+contains the two forms of gestures, and propose a new performance
+metric that for evaluating gesture recognition methods for real-time
 interaction.
-The system is also extensible. Users can define their own gestures by
-giving a few examples rather than writing code. Adding a new gesture only takes
-a couple of minutes.
 
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
@@ -393,10 +391,10 @@ a couple of minutes.
 \section{Introduction}
 % no \IEEEPARstart
 \begin{quotation}
-Imagine next time when you make a presentation, you do not need to stand close
-to your laptop or use a remote control with limited functionalities. You can
-present your work naturally as having a conversation with your audience. You
-swipe your hand left and right to change slides. When you point to the slide
+Imagine how nice it would be, the next time you make a presentation, you do
+not need to stand close to your laptop or use a remote control with limited
+functionality. What if you could present your work as naturally as having a
+conversation with your audience. You swipe your hand left and right to change slides. When you point to the slide
 with your hand, the display shows a pointer cursor following where you are
 pointing at. When you are showing a video,
 you use a palm forward hand pose and move left and right to fast forward or
@@ -408,24 +406,25 @@ pause the slide show (making the screen black) to take the distracting slides of
 screen and get full attention from the audience during presentation.
 \end{quotation}
 
-The scenario above shows an application of multi-modal interface to a real-world
-problem. Different \textit{types} of gestures play an important part in the
+This scenario shows an application of multi-modal interface to a
+real-world problem. Different types of gestures play an important part in the
 scenario. 
 
 Recent advancement in sensing technology (depth sensors, the Leap Motion
 sensor\footnote{\url{https://www.leapmotion.com/}}) and computer vision
-(skeleton tracking \cite{shotton13}) have brought on new possibilities in interaction techniques that depart from the traditional mouse
-and the keyboard that have been used for decades. However, many gestural
+(skeleton tracking \cite{shotton13}) have brought on new possibilities in interaction techniques that depart from traditional mouse
+and keyboard interfaces. Even so, many gestural
 interfaces still mainly make the hands function as a mouse
-with a limited number of other gestures. Previous research on gesture
-recognition usually focuses on one form of gesture and the evaluation is also
+with a limited number of other gestures. 
+
+Previous research on gesture
+recognition usually focuses on one form of gestures, and the evaluation is also
 based on offline recognition. We believe that to design a gesture
 recognition system for natural human computer interaction (HCI), we need to
 start from the user interaction perspective:
 what are the different types of gestures people use;
 when should the system respond; and how should the model be trained or defined.
-These are the questions we address when we develop our system from a
-human-centric approach.
+These are the questions we addressed when we develop our system.
 
 The main contributions of this work include:
 \begin{itemize}
@@ -441,15 +440,13 @@ The main contributions of this work include:
 \section{Gesture Taxonomy for Natural Interaction}\label{sec:taxonomy}
 Several gesture taxonomies have been suggested in the literature. Some of them
 deal with psychological aspects of gestures \cite{kendon86, mcneill82}, while
-some of them deal directly with HCI \cite{quek94,
+others are inspired by an HCI perspective \cite{quek94,
 quek95, Pavlovic97}. The taxonomy that seems most appropriate for natural HCI
 and human-centric design was developed Wobbrock et al. \cite{wobbrock09}. Their
 study is based on eliciting natural behavior from non-technical users when
 interacting with a computing system. Although their user study focuses on
 tabletop gestures, we believe that the results can be generalized to other
-interactive interfaces, e.g., vertical displays. The results from Wobbrock et
-al. not only give guidance to gesture set design, but also guidance to the
-gesture recognition technology which is our focus.
+interactive interfaces. 
 
 Wobbrock et al. classify gestures in four orthogonal dimensions. As a first
 step, we focus on two of them (Table~\ref{tab:taxonomy}) and incorporate them in
@@ -457,17 +454,18 @@ designing the gesture recognition system and interface. We also further generali
 taxonomy to encompass interaction for both vertical and horizontal displays.
 
 \subsection{Gesture Forms and Flows}
-One dimension is the \textit{form} of a gesture. There are two main categories
-in this dimension that are important to distinguish. One category of gestures are characterized
-by their distinctive paths but no distinct hand poses. For
-example, a \textit{swipe left} gesture is characterized by the right to left motion, and a \textit{circle} gesture is
-characterized by the circular motion of the hand. Typically, users just
-hold their hand in some natural relaxed poses. Another category of gestures are
-characterized by their distinct hand poses, but users may move the hand in any
-directions, i.e., no distinct paths. This category of gestures are usually
-associated with direct manipulation of some virtual objects on the interface.
-For example, a user may use a \textit{point} hand pose and move around to point at different things on a display; or a user can use a \textit{palm forward} hand pose to signal direct
-control of a video and move the hand to fast forward or rewind the video. 
+One dimension is the \textit{form} of a gesture; we distinguish two
+categories in this dimension: path and pose. The first category -- path --
+contains gestures characterized by distinct paths without any distinct
+hand pose. For example, a \textit{swipe left} gesture is characterized by a
+right to left motion, while a \textit{circle} gesture is characterized by a
+circular motion of the hand. In doing these, users typically hold their
+hands in some natural relaxed pose. The second category of gestures is
+characterized by distinct hand poses without any distinct paths. This category
+of gestures is usually associated with direct manipulation of some virtual
+objects on the interface.
+For example, a user may use a \textit{point} hand pose and move around to point
+at different things on a display.
 
 \begin{table}[t]
 \caption{Taxonomy of gestures for natural interaction.}
@@ -492,70 +490,65 @@ pose
 
 Another dimension is the \textit{flow} of a gesture. A gesture's flow is
 discrete if the gesture is performed, delimited, recognized, and responded to
-as an \textit{event}. An example is the \textit{wave} gesture which has a few
-repetitions of left and right movement and usually we want the system to respond
-at the last repetition. Flow is continuous if ongoing recognition is required
-and the system should respond frame by frame, such as during the
-\textit{pointing} gesture, we want to show the cursor on the screen continuously
-move according to the hand position. Hence, the flow of the gesture affects how
-the system should respond and this can be a choice at the application level. For
-the same gesture, the application can choose to respond in a continuous or
-discrete manner. 
+as an \textit{event} \cite{wobbrock09}. One example is the \textit{wave} gesture
+which has a few repetitions of left and right movement; usually we want the system to
+respond at the last repetition. Flow is continuous if ongoing recognition is required
+and the system should respond frame by frame, as for example during a
+\textit{point} gesture, where we want to show the cursor on the screen
+continuously moving according to the hand position. 
 
 \subsection{Temporal Modeling of Gestures}
-To build a real-time interactive system, it is important to have a responsive
-system that respond to users' gesture input appropriately according the flow of
-the gesture. As a result, it is important to consider the temporal
-characteristics of gestures.
-
-It has been established that three phases make a gesture:
+Making gesture interaction feel natural requires a system that responds at the
+correct moment. As a result, it is important to consider the temporal
+characteristics of gestures. We set a foundation for doing this by taking
+account of the three phases that make of a gesture:
 \begin{itemize}
   \item pre-stroke,
   \item nucleus (peak \cite{mcneill82}), and
   \item post-stroke \cite{Pavlovic97}.
 \end{itemize}
-The three temporal phases are distinguishable through the general hand/arm
-motion: ``pre-stroke'' and ``post-stroke'' are movement from and to the
+
+``Pre-strokes'' and ``post-strokes'' are movement from and to the
 rest position. The ``nucleus'' of a gesture,
 as Kendon \cite{kendon86} observes, has some ``definite form and enhanced dynamic
-qualities''. Every gesture must have a ``nucleus'', which is considered by
-Kendon to be the content-carrying part of the gesture. Based on this theory, we
-expect that the lack of the ``nucleus'' part is how unintentional movements can
-be distinguished from gestures. 
+qualities''. Every gesture must have a nucleus, which is the content-carrying
+part of the gesture. Based on this theory, we expect that the lack of the
+nucleus phase is how unintentional movements can be distinguished from gestures. 
 
-Since ``nucleus'' is the meaningful part of the gesture, for a discrete flow
-gesture, we want the system to respond immediately at the end of the ``nucleus''
-phase instead of at the end of the ``post-stroke'' phase which can be more
-easily detected by finding the start of the rest position. However, in order to
-make the system more responsive, we address the more challenging problem of
-detecting the start and end of the ``nucleus'' phase from the ``pre-stroke''
-and ``post-stroke'' phases. This allows the system to respond to continuous flow
-gesture immediately at the \textit{start} of the ``nucleus'' phase, and respond
-to discrete flow gesture at the \textit{end} of the ``nucleus'' phase.
+Even though the end of the
+post-stroke phase can be more easily detected by finding the start of the
+rest position, we want to do more than this to. Since nucleus is the meaningful
+part of the gesture, for a discrete flow gesture, we want the system to respond immediately at the end of the nucleus
+phase instead of at the end of the post-stroke phase. To make the system more responsive,
+we address the more challenging problem of detecting the start and end of the nucleus phase from the pre-stroke
+and post-stroke phases. This also allows the system to respond to continuous
+flow gesture immediately at the start of the nucleus phase.
 
 \subsection{Implications for Gesture Recognition System Design}
-Fig.~\ref{fig:system} shows an overview of our system design. We use a
-RGB-depth sensor (the Kinect sensor) for hand tracking so that we can extract
+We develop our system based on the above understanding of the gestures for
+natural interaction. Fig.~\ref{fig:system} shows an overview of our system
+design.
+We use a RGB-depth sensor (the Kinect sensor) for hand tracking so that we can extract
 features for hand poses.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{fig/system_overview.ps}
+\includegraphics[width=0.8\columnwidth]{fig/system_overview.ps}
 \caption{System overview.}
 \label{fig:system}
 \end{figure}
 
-The gesture recognition model estimates the current most likely gesture label,
-gesture phase and gesture event information based on the input stream of feature
-vectors. The gesture information, 
+The gesture recognition model estimates the current most likely gesture label
+and gesture phase information based on the input stream of
+feature vectors. The gesture information, 
 together with smoothed hand position information are sent to the application level at each time frame.
 
 \section{Related Work}\label{sec:related}
-Many previous work on gesture recognition focus on one form of gestures.
-Recently, there are also work on combining different types of gestures.
+Many previous efforts have focused on one form of
+gesture, though some efforts have attempted to handle multiple types.
 
 \subsection{Gesture with Distinct Hand Poses}
-This group work focus on classifying a set of predefined static hand
+One group of prior work focuses on classifying a set of predefined static hand
 poses frame by frame. Freeman and Roth \cite{freeman95} use histogram of local
 orientations, a precursor of HOGs for hand pose recognition. Recognition is based on selecting the feature vector in the training set that is closest to the test feature
 vector. Suryanarayan et al. \cite{suryanarayan2010} use a volumetric shape
@@ -565,26 +558,21 @@ Vector Machine (SVM) for classification.
 \subsection{Gesture with Distinct Paths}
 The gesture production process has a direct analogy to the
 speech production process \cite{Kettebekov01}, and as a result many previous
-work have used hidden Markov models (HMMs) for gesture recognition with distinct
-paths \cite{Starner95, sharma00}. More recently, the discriminative models such as
+efforts have used hidden Markov models (HMMs) for gesture recognition with
+distinct paths \cite{Starner95, sharma00}. More recently, discriminative models such as
 conditional random fields (CRF) and its variants, such as hidden CRF
 \cite{wang06} and latent dynamic CRF (LDCRF) \cite{morency07}, have also been
 applied to gesture recognition with improved recognition results.
 However, discriminative models may require more data to train \cite{ng02},
 and may also take more time to train as the parameter space of the model is
-larger. This is because unlike the generative model where the parameters are
-conditional probabilities, there is no restriction on the parameters of the
-discriminative models besides regularization.
+larger.
 
 Morency et al. \cite{morency07} use LDCRF to learn the transition parameters
-between gestures. In our case, we believe the transition between gestures for interaction is more arbitrary,
-unlike for example in sign language, and we assume that the transitions between
-gestures are uniform and do not need to be trained. The generative model (i.e., HMM) allows us to concatenate the trained HMM based
-on certain probability assumption. However we cannot do the same for the trained
-LDCRF models.
+between gestures. In our case, we assume the transition between gestures for
+interaction is uniform: each gesture is equally likely to transit to every
+other gesture.
 
 \subsection{Different Types of Gestures}
-
 Keskin et al. \cite{keskin12} propose a unified framework to allow concurrent
 usage of hand gestures, shapes and hand skeletons. Hand gestures are modeled
 with mixture of HMMs using spectral clustering. Hand shape classification and
@@ -599,21 +587,17 @@ type of gestures, it will be hard to manually set a velocity threshold to
 distinguish them from gestures with distinct paths.
 
 Oka et al. \cite{Oka02} developed a system that
-allows both direct manipulation and symbolic gestures. The system
-differentiates the gesture as either manipulative or symbolic according to the extension of the thumb. 
-However, this method seems to be arbitrary and ``unnatural''. 
+allows both direct manipulation and symbolic gestures, but requires the user to
+indicate the gesture type by the extension of the thumb.
 
 \subsection{Online Recognition}
 Song et al. uses LDCRF with a temporal sliding window to perform
 online sequence labeling and segmentation simultaneously \cite{song12}. 
-However, the choice of the size of the sliding window, and what happens when the
-window covers only part of a gesture seem problematic.
-
 Fran{\c{c}}oise et al. \cite{francoise11} use hierarchical HMMs to model musical
 gestures using motion data from the Wii remote controller, and use fixed-lag
 smoothing for real-time recognition and segmentation.
-Our method is similar to theirs but we consider different forms of gestures in the
-same framework.
+Our method is similar to theirs but we consider different forms of gestures in
+a single framework.
 
 \subsection{Commercial Systems}
 Many commercial gesture recognition systems uses if-then rules based on
@@ -621,87 +605,79 @@ heuristics. For example, the Leap Motion
 plugin\footnote{\url{https://github.com/hakimel/reveal.js/blob/master/plugin/leap/leap.js}} for the Real.js HTML5 presentation framework use the number of fingers
 detected and the changes in x and y coordinates in consecutive frames to
 detect swipe and point gestures. While if-then rules could be easy to define for
-a smaller number of simple gestures, it may be hard for more complex gestures.
+a small number of simple gestures, it may be hard for more complex gestures.
 For example, it may be hard to define a circle gesture using if-then rules and
-the rules may probably conflict with other rules.
+the rules may conflict with each other.
 
 The gesture interaction provided by the Kinect-based games is
-one of the popular ones. For Kinect games, a user starts by waving to the sensor
-,and then the sensor starts to track the user's hands. Frome this point
-onwards, the hand functions like a mouse. Then the sensor also looks for a specific
-body
-pose\footnote{\url{http://support.xbox.com/en-US/xbox-360/kinect/how-to-use-the-kinect-hub-and-guide}}
-to signal that the user wants to exit.
-Notice that in this way, the system is only looking for one gesture or body pose at a time and the rest of
-the time, it is tracking the hand.
+one of the popular ones. Based on the observation of the current interaction
+available in Kinect games, it seems that the system is only looking for one
+gesture (wave) or body pose (the exit
+pose\footnote{\url{http://support.xbox.com/en-US/xbox-360/kinect/how-to-use-the-kinect-hub-and-guide}}) at a time, and the rest of the time, 
+it is just tracking the hand and the body.
 
 \subsection{Data Sets}
-Many public data sets for evaluating gesture recognition only contain one form
+Many public data sets for evaluating gesture recognition contain only one form
 of gesture \cite{Song11, Ruffieux2013, marcel99}. The Chalearn Gesture Dataset (CGD
-2011) \cite{guyon13} contains a nine gesture categories corresponding to various settings and application domains.
+2011) \cite{guyon13} contains nine gesture categories corresponding to various settings and application domains.
  It contains both static postures and dynamic gestures. In this dataset, a static
 posture is one in which a single posture is held for a certain duration. In
 terms of the static hand posture, the hand is held at similar position for
 multiple instances of the same gesture. In this case, the
 static postures also have distinct paths so they are likely to be able to
-handled by the same method as the dynamic gestures. The gesture recognition
-algorithm employed by the top winner is a Bayesian network similar to the hidden
-Markov model (HMM) used in speech recognition \cite{guyon13results}. Hence in
-this dataset, it does not contain gestures with distinct hand poses and
-arbitrary movement. For this form of gestures, we believe we cannot just
-treat them exactly the same as gestures with distinct paths. Because if we train
-a model based on the training data that also models the paths, that model may
-not be applicable for testing because the movement of the hand can change all
-the time.
+handled by the same method as the dynamic gestures. This dataset does not
+contain gestures with distinct hand poses but arbitrary movement
+(Table~\ref{tab:taxonomy} row 2).
 
 \section{Hand Tracking and Feature Extraction}
-As one form of the gestures are characterized by their distinct hand poses, we
-need to track the full hand, rather than just treating the hand as one point. We
+As one category of gestures is characterized by distinct hand poses,
+we need to track the full hand, rather than just treating the hand as one point. We
 also need to derive a feature vector that represents the hand shape as well.
 
-The skeleton tracking from the Kinect SDK is
-relative robust for standing articulated body poses. At each time frame, we use
-the hand joint position reported from the SDK to find the initial rough estimation of the
-bounding box of the hand in the depth frame. Then we use skin detection to
-filter out non-skin pixels in the bounding box after aligning the RGB and the
-depth frames, and refine the bounding box using 4 interactions of CAMSHIFT
-\cite{bradski98}. We normalize the bounding box to a $32\times 32$ px depth
-mapped image. Histogram of oriented gradients (HOGs) \cite{dalal05} is computed from
-the normalized hand image (cell size = 4, number of orientation bins = 9).
-Since the depth data is less affected by change in illumination, we only use one
+We base our hand tracking on information from the skeleton tracking of the
+Kinect SDK, which is relatively robust for standing articulated body poses. At
+each time frame, we use the hand joint position reported from the SDK as an
+initial rough estimate of the bounding box of the hand in the depth frame.
+We align the RGB and the depth frames, use skin detection to filter out
+non-skin pixels in the bounding box, and then refine the bounding box using 4
+interactions of CAMSHIFT \cite{bradski98}. We normalize the bounding box to a $32\times 32$ px depth
+mapped image. We compute histogram of oriented gradients (HOGs)
+feature \cite{dalal05} from the normalized hand image (cell size =
+4, number of orientation bins = 9) (see Fig.~\ref{fig:tracking}).
+Since the depth data is less affected by change in illumination, we use only one
 fold of normalization in the HOG feature to speed up processing.
 This gives us a HOG feature of length 441 ($(32/4 - 1)\times (32/4 - 1)\times 9$). The HOG
-feature has been used as a hand pose descriptor in previous works \cite{song12} where they are often 
-used as the input to a classifier such as Support Vector Machine
-(SVM). In our system, after applying principal component analysis (PCA) to
-reduce the dimensionality from 441 to 14, we use it directly as part of the input feature
-vector to the hidden Markov model (HMM) based recognition framework.
+feature has been used as a hand pose descriptor in previous work \cite{song12}
+where it is often used as the input to a classifier such (e.g., Support Vector
+Machine (SVM)). Our system uses principal component analysis (PCA)
+to reduce the HOD dimensionality from 441 to 14, then uses it directly as part
+of the input feature vector to the hidden Markov model (HMM) based recognition framework.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{fig/hand_tracking.ps}
+\includegraphics[width=0.8\columnwidth]{fig/hand_tracking.ps}
 \caption{Hand tracking and hand pose feature extraction.}
 \label{fig:tracking}
 \end{figure}
 
 The feature vector $\underline{x}_t$ at frame $t$ is then a concatenation of motion features and encoded HOG features. The
 motion features include relative position of the hand to the shoulder joint,
-velocity and and acceleration, all in 3D world coordinate. The feature vector is
-computed for each input frame streamed from the sensor to form a sequence of
+velocity and and acceleration, all in 3D world coordinates. The feature vector
+is computed for each input frame streamed from the sensor to form a sequence of
 feature vectors.
 
 \section{Real-Time Continuous Gesture Recognition}
 The temporal model of gestures can be represented by a stochastic state machine.
-Each gesture phase can again be represented by a stochastic state machine with
-each state generating an observation (i.e. the feature vector). This process
-can be viewed as a hierarchical HMM (HHMM) (Fig.~\ref{fig:hhmm}). If we assume
+Each gesture phase can in turn also be represented by a stochastic state
+machine, with each state generating an observation (i.e. the feature vector).
+This process can be viewed as a hierarchical HMM (HHMM) (Fig.~\ref{fig:hhmm}). If we assume
 that the states in the sub-HMMs are not shared, we can collapse the hierarchical HMM
-into a one-level HMM for fast inference as the graphical model for one-level HMM
-does not have loops.
+into a one-level HMM for fast inference, as the graphical model for one-level
+HMM does not have loops.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{fig/hhmm.ps}
+\includegraphics[width=0.7\columnwidth]{fig/hhmm.ps}
 \caption{State transition diagram of the hierarchical HMM representation of
 gesture phases. Double-ringed states are end states.}
 \label{fig:hhmm}
@@ -709,8 +685,8 @@ gesture phases. Double-ringed states are end states.}
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{fig/embedded.ps}
-\caption{Embed phase HMMs into an entire gesture.}
+\includegraphics[width=0.7\columnwidth]{fig/embedded.ps}
+\caption{Embedding phase HMMs into an entire gesture.}
 \label{fig:embed}
 \end{figure}
 
@@ -721,37 +697,34 @@ if we want users to be able to easily add their new gestures by giving a few
 examples, it will be tedious to manually label the start and the end of the
 three phases. In this case, we can do embedded training \cite{young1994}, i.e.
 train each phase sub-HMM embedded in an entire gesture segment
-(\ref{fig:embed}).
+(Fig.~\ref{fig:embed}).
+
+\subsection{Unified Framework}\label{sec:unified}
+We do not treat the two forms of gestures separately: gestures with
+distinct paths and gestures with distinct hand poses are handled within a
+single probabilistic framework. This avoids making early hard decisions (which
+form of gesture it is) which will be hard to correct later. Instead, we want to
+make a decision only when a response is needed, according to the flow of the
+current most likely gesture, and keep and propagate beliefs as probabilities as time progresses.
+
+\subsubsection{Gestures with distinct paths}
+We use embedded training to
+combine the three gesture phases together and use normal Baum-Welch algorithm to compute the
+maximum likelihood of the parameters. 
 
 Through cross-validation, we choose to use one hidden state for pre-stroke and
 post-stroke phases. We use the Bakis (left-right) model \cite{Bauer00} for the
 nucleus phase, but add a backward transition from the last hidden state to the first
-one for gestures with arbitrary number of repetitions (e.g., \textit{wave}
-gesture).
+one for gestures with an arbitrary number of repetitions (e.g., \textit{wave}
+gesture). We use a mixture of Gaussians to model the emission probabilities for
+each hidden state. We also estimate the termination
+probabilities as in \cite{yin13}.
 
-We use mixture of Gaussians to model the emission probabilities for each hidden
-state. 
-
-\subsection{Unified Framework}\label{sec:unified}
-We do not treat the two \textit{forms} of gestures separately: gestures with
-distinct paths and gestures with distinct hand poses. Doing that will require
-classifying the gestures into the two categories and applying different methods
-to further classify the gestures. We want to avoid making early hard decisions
-which will be hard to correct. Instead, we want to make decision only when a
-response is needed according to the flow of the current most likely gesture, and
-keep and propagate beliefs as probabilities as time progresses.
-
-We incorporate the gestures with distinct hand poses into the HMM-based
-framework and use one hidden state to represent their nuclei phases. The
-rationale for this is that the hidden state actually represents the hand pose of
-the gesture. The variance of the motion features in the mixture of Gaussians
-corresponding to the hidden state will be large so that the motion features do
-not affect the emission probability very much.
-
-Let $s_{\text{pose}}$ be the single hidden state for the nucleus phase for a
-gesture with distinct hand pose. Instead of doing embedded training, we directly
-compute the maximum likelihood estimates for the mixture of Gaussians emission
-probabilities for $s_{\text{pose}}$. Let $\underline{x}_1^T$ be a sequence of
+\subsubsection{Gesture with distinct hand poses}
+We use one hidden state to represent this form of gestures. Let
+$s_{\text{pose}}$ be the single hidden state for the nucleus phase for a gesture
+with a distinct hand pose (Fig.~\ref{fig:single}). Instead of doing embedded
+training, we directly compute the maximum likelihood estimates for the mixture of Gaussians emission probabilities for $s_{\text{pose}}$. Let $\underline{x}_1^T$ be a sequence of
 feature vectors corresponding to a gesture with a distinct hand pose. The
 feature vector sequence also contains random variations in the hand movement
 path. 
@@ -766,36 +739,34 @@ single state HMM, the probability of remaining in state $s_{\text{pose}}$ for
 exactly $d$ steps is $P(d) = p(1-p)^{d - 1}$, where $p = P(END|s_\text{pose})$
 is the termination probability for $s_{\text{pose}}$. This means the expected
 number of steps remaining in state $s_{\text{pose}}$ is $\frac{1}{p}$. We assume
-that the minimum duration of a gesture with distinct hand pose is 1s (30
-frames). The termination probability $P(END|s_\text{pose})$ is then set to
+that the minimum duration of a gesture with distinct hand pose is one second
+(30 frames). The termination probability $P(END|s_\text{pose})$ is then set to
 be less than $1/30$.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{fig/single_state.ps}
+\includegraphics[width=0.5\columnwidth]{fig/single_state.ps}
+\caption{State transition diagram of a single state HMM for gestures with
+distinct hand poses. }
+\label{fig:single}
 \end{figure}
 
 We also use one hidden state to model the rest position in a similar way.
 
-For gestures with distinct paths, we use embedded training to combine the three
-gesture phases together and use normal Baum-Welch algorithm to compute the
-maximum likelihood of the parameters. We also estimate the termination
-probabilities as in \cite{yin13}.
-
 
 \subsection{Real-Time Recognition}
-We train the HMMs separately for each gesture, and then combine them into the
+We train the HMMs separately for each gesture, then combine them into the
 hierarchical structure shown in Fig.~\ref{fig:combined}. We allow sharing of the
 hidden states for pre-stroke and post-stroke phases for all the gestures.
 
 The hierarchical model allows us to do simultaneous segmentation and
 recognition. We want to avoid doing segmentation first and then find the most
-likely HMM for the given sequence. This is because segmentation based on
+likely HMM for the given sequence, because segmentation based on
 differentiating rest position versus non-rest position will not allow the system
-to respond fast enough as we want the system to respond at the beginning of the
+to respond fast enough. We want the system to respond at the beginning of the
 post-stroke phase rather then at the beginning of the rest position. In
-addition, making a hard decision on segmentation can also introduce errors that
-are hard to correct. 
+addition, making a hard decision on segmentation can introduce errors that
+are hard to correct later. 
 
 For fast inference, we
 flatten the hierarchical HMM into a regular HMM by creating an HMM state for
@@ -807,7 +778,7 @@ second hidden state in the nucleus phase of gesture 1.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{fig/combined.ps}
+\includegraphics[width=0.7\columnwidth]{fig/combined.ps}
 \caption{Hierarchical HMMs for all gestures.}
 \label{fig:combined}
 \end{figure}
@@ -822,10 +793,9 @@ current time $t$, i.e., compute $\gamma_{t - L}(s) \eqdef P(S_{t -
 L} = s|\underline{x}_1^t)$, where $L>0$ is the lag. Introducing lag time is a
 tradeoff between accuracy and responsiveness. Using some future evidence to
 smooth the estimate can increase the accuracy while adding some delay. However
-if the delay is small, it might be unnoticeable. We set $L=5$ frames which
-is $1/6^{th}$ of a second with 30Hz frame rate. This is below the average human
-reaction time which is around
-200ms\footnote{\url{http://www.humanbenchmark.com/tests/reactiontime/}}.
+if the delay is small, it might be unnoticeable.
+In the Experiment Evaluation section (Section~\ref{sec:evaluation}), we show
+details about the relationship between $L$ and the recognition performance.
 
 Fixed-lag smoothing can be implemented efficiently. We compute forward
 probabilities $\alpha_t$ normally and keep a history window of $\alpha_{t -
@@ -839,13 +809,13 @@ number of hidden states in the flattened HMM.
 
 Note that at time $t$, the belief state at $t - L$ is committed, while the belief state from $t - L + 1$ to $t$ will still be revised later.
 
-Then we can compute the most likely hidden state at $t - L$:
+We can then compute the most likely hidden state at $t - L$:
 \begin{align}
 \hat{s} = \arg\max_s \gamma_{t - L}(s)
 \end{align}
 
-From the most likely hidden state, we can map it back to the gesture label it
-belongs to, including the rest position and also the gesture phase. In this way
+We map the most likely hidden state to the gesture label it
+belongs to (including the rest position) and the gesture phase. In this way
 we achieve simultaneous segmentation and recognition.
 
 Gesture events are detected at the boundary of a phase change: start pre-stroke,
@@ -854,36 +824,33 @@ gesture label for the nucleus phase, are sent to the application level.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{fig/circle_shake.eps}
-\caption{Visualization of recognition result.}
-\label{fig:visual_recog}
-\end{figure}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{fig/circle_shake_label.ps}
-\caption{Most likely hidden states from fixed-lag smoothing.}
+\includegraphics[width=1.1\columnwidth]{fig/circle_shake_label.ps}
+\caption{Most likely hidden states using fixed-lag smoothing. Different
+colors indicate different hidden state. Yellow indicates rest position.}
 \label{fig:visual_hidden}
 \end{figure}
 
-Fig.~\ref{fig:visual_recog} shows a visualization of the recognition result on a
-test sequence, and Fig.~\ref{fig:visual_hidden} shows the corresponding
-most likely hidden states with fixed-lag smoothing online inference.
+Fig.~\ref{fig:visual_hidden} shows a visualization of the
+most likely hidden states based on the online fixed-lag smoothing inference
+with $L = 5$.
+This is based on an input sequence of 6 gestures. The first 3 gestures are
+``circle'' and the last 3 gestures are ``shake hand'' gestures. Notice that in
+the first segment, at the beginning, the most likely hidden state is the
+pre-stroke for ``shake hand'', but since we do not need to respond at this time,
+the wrong inference does not matter. After a few more frames, estimates are
+updated to have the correct most likely gesture label and the system will
+respond correct when it detects the start of the post-stroke of ``circle''
+gesture.
 
-\section{User Study and Data Collection}
-As mentioned in Related Work, there is a lack of gesture data set that
-includes both gestures with distinct paths and gestures with distinct hand
-poses. To evaluate our method, we collected a dataset with the two forms of
-gestures mentioned in Section~\ref{sec:taxonomy}.
-
-A vocabulary of 7 one-hand/arm gestures focusing on combining two \textit{forms}
-gestures has been chosen. They are also chosen to span over
-different potential difficulties (see the comments in Table~\ref{tab:gestures}).
-These gestures can also have potential application to gesture-controlled
-PowerPoint presentation.
+\section{Data Collection and User Study}
+Previous related work do not appear to have gesture data sets
+that include both gestures with distinct paths and gestures with distinct hand
+poses. To evaluate our method, we collected a dataset with a vocabulary of 7
+one-hand/arm gestures focusing on combining these two forms of gestures. They
+are also chosen to span over different potential difficulties (see the comments in Table~\ref{tab:gestures}).
 
 \begin{table}
-\caption{}
+\caption{List of gestures recorded in the dataset.}
 \label{tab:gestures}
 \centering
 \begin{tabular}{|c|l|l|l|}
@@ -907,39 +874,39 @@ PowerPoint presentation.
 \end{tabular}
 \end{table}
 
-The dataset contains data from 10 paid participants each
+The dataset contains data from 10 participants each
 doing 4 sessions. All the participants are university students.
-The participants were shown video demonstration of each gesture at the beginning. In each
-session, the participant performs each gesture class 3 times according to the
-text prompts on screen indicating the name of the gesture to perform.
-The order of the gesture is random and the time between each gesture is random
-as well (between 2s-6s). The first 2 sessions have ``Rest'' prompt between each
-gesture telling participants to go to the rest position (hands relaxing at the side of
-the body), and the second 2 sessions do not have ``Rest'' prompt so participants
-can choose to rest or not between consecutive gestures. This is also an
-additional challenge to previous datasets \cite{Ruffieux2013} where gestures are always
-delimited by rest positions.
+The participants were shown video demonstration of each gesture at the beginning. 
+
+\subsection{Recording Setup and Procedure}
+In each session, the participant stands at about 1.5m from the Kinect
+for Windows sensor (version one), and performs each gesture 3 times
+according to the text prompts on screen indicating the name of the gesture to perform.
+The order of the gestures is random and the time between each gesture is random
+(between 2s and 6s). The first 2 sessions have ``Rest'' prompts between each
+gesture, telling participants to go to the rest position (hands relaxing at the
+side of the body), and the second 2 sessions do not have ``Rest'' prompts so
+participants can choose to rest or not between consecutive gestures. This too
+distinguishes the dataset from previous ones \cite{Ruffieux2013, guyon13} where
+gestures are always delimited by rest positions.
 
 Unlike Ruffieux et al. \cite{Ruffieux2013}, we do not show video demonstration
-every time the participant performs a gesture because we want to simulate more
+every time the participants perform a gesture because we want a
 realistic scenario. In real practice, it is unlikely that a user will follow a
-video demonstration every he/she does a gesture. The result of this is that
-there will be more variations among the participants.
+video demonstration every time he/she does a gesture. The result of this is that
+there will be more variations among the gestures.
 
-To simulate arbitrary movement for gestures with distinct hand poses that
-require continuous response, the text prompt also asks participants to draw
-letters in the air with the specified hand pose. We did this because in the
-pilot study, we found that with no actual task to perform and visual feedback,
-the participants may feel uncomfortable to move arbitrarily.
+To motivate movement for gestures with distinct hand poses that
+require a continuous response, the text prompt asks participants to draw
+random letters in the air with the specified hand pose. 
 
-The full corpus contains 
-\begin{align*}
-10P \times 4S \times 7G \times 3R = 840 \text{ gesture occurrences}
-\end{align*}
+The full corpus contains $
+10P \times 4S \times 7G \times 3R = 840$ gesture occurrences
 where P = participants, S = sessions, G = unique gestures, R = repetitions per
-gesture. There is approximately 96 minutes of continuous recording. The data
-recorded is the raw data from the Kinect sensor including RGB, depth and
-skeleton data.
+gesture. There are approximately 96 minutes of continuous recording,
+recorded in the raw data from the Kinect sensor, including RGB, depth and
+skeleton data. Both the RGB and depth data have a resolution of
+$640\times480$px. The frame rate is 30 frame per second (FPS).
 
 \subsection{Qualitative Observations}
 We find that there is considerable variations in the way participants perform
@@ -954,18 +921,18 @@ less distinct hand poses (hand is more relaxed). However, within users, they are
 quite consistent within each gesture. 
 
 \subsection{User Preferences}
-We also did a questionnaire with the 12 participants regarding gesture input
-related questions. 
-
+We did a survey with the participants with questions that can influence
+gesture interface design. We asked them, given a gesture input interface:
 \begin{itemize}
-  \item Predefined vs. user defined gestures: 90\% of the participants prefer to
-  be able to define their own gestures if necessary while 10\% of them prefer to following prefined
-gestures completely. No one prefers to define their own gestures from the start
-either.
-\item How to define gestures: 80\% prefers to giving examples to the system by
-performing the gestures themselves; no one prefers to only being able to
-define some rules in terms of positions and directions of movement of the hands.
-However 20\% prefers to being able to do both.
+  \item Whether they prefer predefined gestures or user defined gestures: 90\%
+  of the participants prefer to be able to define their own gestures if necessary while 10\% of them prefer to following prefined
+gestures completely. As no one prefers to define their own gestures at the very
+beginning either.
+\item How to define gestures: 80\% prefer defining gesture by 
+performing the gestures themselves; no one prefers to
+define gestures solely via rules written in terms of positions and directions
+of movement of the hands.
+However 20\% prefer to being able to do both.
 \item Number of repetitions per gesture for training: 50\% are willing to give a
 maximum of 4 - 6 examples, 40\% are willing ot give 1 - 3 examples, and 10\% are
 willing to give more than 13 examples. So average maximum is about 5
@@ -977,82 +944,121 @@ gestures.
 average score is 4 out of 5 where 5 is very intuitive.
 \end{itemize}
 
-\subsubsection{Implication to Gesture Interaction Interface}
-Based on our observation of large variation between users and small variations
-within users and majority of participants preferring defining their own gestures
-if necessary, it suggests that it may be more important to optimize user
-dependent recognition. As no one prefers to define own gesture at the very
+\subsection{Implications for Gesture Interaction Interface}
+Based on our observation of the large variation in gesture execution among
+users and small variations within users, and the fact that a majority of
+participants preferring defining their own gestures if they do not the
+predefined gestures, we suggest that it may be more important to optimize user
+dependent recognition. As no one prefers to define their own gesture at the very
 beginning, it also means that having a reasonable predefined gesture set and
-basic user independent model for recognition is useful too.
+basic user independent model for recognition will be useful too.
 
-Recognition method based on examples will allow users to train models of their
-own gestures easily, and we also need to optimize for developing methods that
-require a few number of training examples.
+Recognition methods based on examples will allow users to train models of their
+own gestures easily. We also need to develop methods that
+require relatively few training examples.
 
-\section{Performance Metric}
+\section{Hybrid Performance Metric}
 Both frame \cite{song12} and event-based \cite{guyon13} metrics has been
-used for evaluating gesture recognition systems. Many of the performance metrics
-are more relevant for offline applications such as video analysis and retrieval. Frame error based
-metrics can suffer from class skew problem \cite{ward11}. Frame-based evaluation
-is also less relevant for gestures requiring discrete responses. Discrete
-response is inherently event based, and especially for online recognition, it is hard to
-recognize the gesture at an earlier stage. For the ChaLearn
-Gesture Challenge 2012, Guyon et al.
+used for evaluating gesture recognition systems. A \textit{frame} is a
+fixed-length, fixed-rate unit of time. It is often the smallest unit of measure
+defined by the system \cite{ward11} and in such cases approximates continuous
+time.
+For example, in our case, a frame is a data frame consisting of a RGB data frame, a depth data frame and a skeleton data from the
+sensor at 30 FPS. An \textit{event} is a variable duration sequence of frames
+within a continuous time-series.  It has a start time and a stop time.
+
+Each of these metrics alone may not be adequate for evaluating a real-time
+gesture recognition system handling different types of gestures. Frame-based
+evaluation is less relevant for gestures requiring discrete responses. For the ChaLearn Gesture Challenge 2012, Guyon et al.
 \cite{guyon13} use the Levenshtein distance between the ordered list of
-recognized events and the ground truth events. Such event-based metrics that
-ignore timing of recognition is inappropriate for real-time
-applications where responsiveness of the system matters and hence the timing of
-the recognition matters.
+recognized events and the ground truth events. However, such event-based metrics
+that ignore timing of recognition is inappropriate for real-time
+applications where responsiveness of the system matters.
 
-Ruffieux et al. proposed a way to combine both a time-based metric
-\cite{Ruffieux2013} and event-based metrics. In computing the event-based
-metrics, they only consider an event ``correct'', if the absolute difference between start time of the
-recognized nucleus phase and that of the ground truth nucleus phase, and the
-absolute difference between the end time of the recognized nucleus phase and
-that of the ground truth are both less than 50\% of the duration of the grounth truth
-nucleus. As both the event based and the time based metrics take timing into
-consideration, it is actually more difficult to compare different algorithms and
-the choice of the 50\% of the grounth truth duration is somewhat arbitrary. We
-propose to completely separate the time-based metrics and the event-based
-metrics.
+Ruffieux et al. combined a time-based metric with an event-based metirc
+\cite{Ruffieux2013}. Ward et al. \cite{ward11} proposed a comprehensive
+scheme of combining both frame and event scoring.
+We believe that all three types of information -- frames, events and
+timings -- are relevant for a real-time system that responds to different types
+of gestures. Hence, we developed a hybrid performance metric.
 
-Ward et al. \cite{ward11} proposed a comprehensive hybrid
-scheme by combining information from both frame and event scoring. We also take
-a hybrid approach based on the the different types of system response according to different flow of the gestures. 
-For discrete gestures, the full segment of the gesture is considered as an
-event, whereas for continuous gestures, every frame is considered as an event.
+For discrete flow gestures, the system responds at the end of the nucleus phase,
+so the evaluation should be event-based. Let $T_{{\text{gt\_start\_pre}}}$ be
+the ground truth start time of the pre-stroke phase and
+$T_{{\text{gts\_stop\_post}}}$ be the ground truth stop time of the post-stroke
+phase.
+An recognized event is considered a true positive (TP) if the time of response ($T_{\text{response}}$) 
+occurs between $T_{{\text{gt\_start\_pre}}}$ and $T_{{\text{gt\_stop\_post}}} +
+0.5\times(T_{{\text{gt\_stop\_post}}} - T_{\text{gt\_start\_pre}})$. We allow
+some margin for error because there can be small ground truth timing errors.
+Once a TP event is detected, the corresponding ground truth event is not
+considered for further matching so that multiple responses for the same gesture
+will be penalized. We then can compute event-based precision, recall and F1 score.
 
-The relevant parameters for evaluating the timing of the recognitions are
+For discrete flow gestures, we also define Responsiveness Score (RS) as the time
+difference (in seconds) between the moment when the system responds and the moment when the hand goes to a rest
+position or changes gesture. Let $N_{TP}$ be the number of true positives, then
+\begin{align}
+RS = \frac{\sum_{i = 1}^{N_{TP}}T_{{\text{gt\_stop\_post}}} -
+T_{\text{response}}}{N_{TP}}
+\end{align}
 
-\section{Experimental Evaluation}
-We evaluate our method based on the data set we collected using the
-evaluation metric we propose in the previous sections. The evaluation is based
-on the assumption that all the gestures with distinct paths (gesture \#1-4)
-are also discrete flow gestures and gestures with distinct hand poses (gesture
-\#5-7) are continuous flow gestures. 
+For continuous flow gestures, the system responds frame by frame, so it is
+more appropriate to use frame-based evaluation. For all the frames that are
+recognized at a continuous gestures, we can compute the number of TPs by
+comparing with the corresponding frame in the ground truth. Then, we can
+compute frame-based precision, recall and F1 score for all the frames
+corresponding to continuous flow gestures.
 
-\subsection{Comparing Different Topologies}
-In our unified HMM-based framework, is it necessary to treat gestures with
-static hand poses differently from the gestures with distinct paths?
+The average of the two F1 scores can give an overall indication of the
+performance of the system.
+
+\section{Experiment Evaluation}\label{sec:evaluation}
+We evaluate our method based on the dataset we collected, using the
+evaluation metrics we propose in the previous sections. The evaluation is based
+on the assumption that all the gestures with distinct paths (gesture \#1--4)
+are discrete flow gestures, and gestures with distinct hand poses (gesture
+\#5--7) are continuous flow gestures. 
+
+Fig.~\ref{fig:recog-result} shows a visualization of the recognition result on a
+test sequence. This highlights the challenges in the test sequences: 21
+gestures in each continuous unsegmented sequence; sometimes gestures immediately
+follow one anther.
+
+Our survey results show that it is
+important to allow users to quickly define and train their own gestures. Hence,
+we evaluate our system using user dependent training and testing. For each user
+in the dataset, we use the first 2 sessions of recording (6 samples per gesture)
+as training examples and the last 2 sessions of recording as testing examples.
+We report the average results for 10 users below.
+
+\begin{figure}[t]
+\centering
+\includegraphics[trim=10mm 10mm 10mm 0, clip,
+width=\columnwidth]{fig/recog_result_m3.eps}
+\caption{Visualization of recognition result with respect to ground truth.
+The colors correspond to different gestures. For discrete flow gestures
+(swipe left/right, circle, horizontal wave), one color segment with a fixed
+length is shown at the time of response. For continuous flow gestures, the recognized gesture is shown for each frame
+indicating frame-by-frame responses.}
+\label{fig:recog-result}
+\end{figure}
+
+\begin{itemize}
+\item \textbf{Compare different topologies}
+In our unified HMM-based framework, is it necessary to
+treat gestures with static hand poses differently from the gestures with distinct paths?
 Table~\ref{tab:result} compares the results between two topologies. The first
 row is the result from treating the two forms of the gestures in the same way,
 i.e., all gestures have the same left-right Bakis model for their nucleus
-phases. The second row is the result from using one single state form gesture
-with distinct hand poses. Treating the two forms of gestures separately
-significantly increases the precision, recall and F1 score for gestures with
-distinct hand poses confirming our rationale for choosing this topology in
-Section~\ref{sec:unified}.
-
-Compare different number of mixtures
-
-Overfitting
-
-Compare user dependent vs user independent result
-
-Compare different lag times
+phases. The second row is the result from using a single state for gestures
+with distinct hand poses. Having different HMM topologies for the two forms of
+gestures significantly increases the precision, recall and F1 score for gestures with
+distinct hand poses.
 
 \begin{table*}[t]
-\caption{Comparison between different topologies.}
+\caption{Results for using different topologies. The numbers in parentheses are
+standard deviations.}
 \label{tab:result}
 \centering
 \begin{tabular}{|l|l|l|l|l|l|l|l|l|}
@@ -1061,38 +1067,56 @@ Compare different lag times
 \multicolumn{3}{|c|}{Distinct hand poses \& continuous flow gestures} &
 Average\\
 \hline
-& Precision & Recall & F1 & Responsiveness (sec) & Precision & Recall & F1 &
+& Precision & Recall & F1 & Responsiveness (sec.) & Precision & Recall & F1 &
 F1\\
 \hline
 Same topology for two forms of gestures & 0.77 (0.14) & 0.89 (0.09) & 0.82
 (0.10) & 0.6 (0.3) & 0.54 (0.13) & 0.24 (0.08) & 0.33 (0.09) & 0.58 (0.10)
 \\
 \hline
-Different topology for two forms of gestures & 0.77 (0.15) & 0.88 (0.11) &
-0.81 (0.11) & 0.6 (0.3) & 0.60 (0.10) & 0.59 (0.12) & 0.61 (0.09) & \textbf{0.71
+Different topologies for the forms of gestures & 0.77 (0.15) & 0.88 (0.11) &
+0.81 (0.11) & 0.6 (0.3) & 0.60 (0.10) & 0.62 (0.09) & 0.61 (0.09) & \textbf{0.71
 (0.10)}\\
 \hline
 \end{tabular}
 \end{table*}
 
-Within the same user, there may be variation in the hand pose for a particular
-gesture with distinct hand poses. For example, the pointing gesture can have
-different angles. This is why we use mixture of Gaussians for the emission
-probabilities for the hand pose HMM as well. 
+\item \textbf{Compare different number of mixtures}
+Within the same user, there may be variation in the hand pose for a
+gesture with distinct hand pose. For example, the ``point'' hand pose can have
+different orientations. This is why we use a mixture of Gaussians for the
+emission probabilities. Fig.~\ref{fig:mixtures}
+shows that the F1 scores increases as the number of mixtures (M) increases until $M=3$.
+After that, we start to see the effect of overfitting.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{fig/f1_nM.ps}
-\caption{Most likely hidden states from fixed-lag smoothing.}
+\caption{F1 scores versus number of mixtures.}
 \label{fig:mixtures}
 \end{figure}
+
+%Compare user dependent vs user independent result
+
+\item \textbf{Compare different lag times}
+Fig.\ref{fig:lag} shows how the F1 scores change with respect to the lag time
+($L$) in fixed-lag smoothing. The performance increases as $L$ increases, and
+plateaus at $L=8$ frames which is about 0.3s at 30 FPS. This shows that more
+evidence does help to smooth the estimates until a limit, and we do not need to
+sacrifice too much delay to reach the limit. Our result shows that the
+responsiveness score stays around 0.6-0.7 seconds as we increases $L$.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{fig/f1_lag.ps}
-\caption{Most likely hidden states from fixed-lag smoothing.}
+\caption{F1 scores versus lag time.}
 \label{fig:lag}
 \end{figure}
+
+\end{itemize}
+
+Our system is fast to train as well. Average training time per user is about 5s
+with 6 training samples for 7 gestures.
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
@@ -1142,20 +1166,27 @@ probabilities for the hand pose HMM as well.
 % command of the stfloats package.
 
 \section{Conclusion and Future Work}
-The experimental evaluation shows promising result for our unified
-probabilistic framework for real-time gesture recognition that combines two forms of gestures.
+The experiment evaluation shows promising results for our unified
+probabilistic framework for real-time gesture recognition that handles two forms
+of gestures.
 The performance for gestures with distinct hand poses is lower than that for
-gestures with distinct paths. The reason could be the limitation of the depth
-resolution of the Kinect sensor.
+gestures with distinct paths. The reason could be the limitation of both the
+pixel and the depth resolutions of the Kinect sensor. At 1.5m, the depth
+resolution is about 5mm \cite{khoshelham2011}. It would be interesting to test
+the new version of the Kinect sensor which uses a time-of-flight depth sensor
+and is reported to have higher resolution. We are going to to explore other
+feature descriptors and encoding method (e.g., sparse PCA) to see wether we can
+improve the result for gestures with distinct hand poses.
 
 Using embedded training and hidden state information we can effectively
 detect gesture phases, allowing the system to respond more promptly. On average,
 for discrete flow gestures, the system responds 0.6s before the hand comes to
 rest. 
 
-We collected a new dataset that include two forms of gestures, a
-combination currently lacking in the community. We also propose a
-evaluation metric that is pertinent to real-time interaction and different types of gestures.
+We also collected a new dataset that include two forms of gestures, a
+combination currently lacking in the community. We are planning to make it
+public after anonymizing the participants. We also propose a evaluation metric
+that is more pertinent to real-time interaction and different types of gestures.
  
 % use section* for acknowledgement
 

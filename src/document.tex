@@ -830,8 +830,9 @@ gesture label for the nucleus phase, are sent to the application level.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=1.1\columnwidth]{fig/circle_shake_label.ps} \caption{Most
-likely hidden states using fixed-lag smoothing. Different colors indicate different hidden states. Yellow indicates rest position.}
+\includegraphics[trim=0 5mm 0
+5mm, clip, width=1.1\columnwidth]{fig/circle_shake_label.ps}
+\caption{Most likely hidden states using fixed-lag smoothing. Different colors indicate different hidden states. Yellow indicates rest position.}
 \label{fig:visual_hidden}
 \end{figure}
 
@@ -1042,7 +1043,7 @@ We report the average results for 10 users.
 
 \begin{figure}[t]
 \centering
-\includegraphics[trim=10mm 10mm 10mm 0, clip,
+\includegraphics[trim=10mm 5mm 10mm 5mm, clip,
 width=\columnwidth]{fig/recog_result_m3.eps}
 \caption{Comparison between recognition result using online inference
 and ground truth.
@@ -1102,7 +1103,7 @@ After that, we start to see the effect of overfitting.
 
 \begin{figure}[t]
 \centering
-\includegraphics[trim=10mm 10mm 10mm 10mm,
+\includegraphics[trim=10mm 5mm 10mm 15mm,
 clip, width=\columnwidth]{fig/f1_nM.ps}
 \caption{F1 scores versus number of mixtures.}
 \label{fig:mixtures}
@@ -1120,7 +1121,7 @@ responsiveness score stays around 0.6-0.7 seconds as we increase $L$.
 
 \begin{figure}[t]
 \centering
-\includegraphics[trim=0 10mm 0 10mm, clip, width=\columnwidth]{fig/f1_lag.ps}
+\includegraphics[trim=0 5mm 0 15mm, clip, width=\columnwidth]{fig/f1_lag.ps}
 \caption{F1 scores versus lag time.}
 \label{fig:lag}
 \end{figure}
@@ -1178,9 +1179,12 @@ gesture.
 % command of the stfloats package.
 
 \section{Conclusion and Future Work}
-We designed a system from the natural human computer interaction perspective.
+We designed our system from natural human computer interaction perspective.
 Our evaluation shows promising results for our unified probabilistic framework
-for real-time gesture recognition that handles two forms of gestures.
+for real-time gesture recognition that handles two forms of gestures. Using the
+framework, we developed a gesture controlled presentation application similar to
+the one described at the beginning of this paper.
+
 The performance for gestures with distinct hand poses is lower than that for
 gestures with distinct paths. This may be due to limit in
 both the pixel and the depth resolutions of the Kinect sensor. It would be interesting to test

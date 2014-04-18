@@ -6,3 +6,5 @@ src/*.ps
 .settings
 *.bbl
 *.blg
+*.log
+*.aux
